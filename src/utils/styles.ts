@@ -1,4 +1,4 @@
-import { Priority } from '../types/index';
+import type { Priority } from '../types/index';
 
 export const priorityColors: Record<Priority, string> = {
   high: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 border-red-200 dark:border-red-500/20',

@@ -1,9 +1,50 @@
 import { useState } from 'react';
+import { useTodos } from './hooks/useTodos';
 import { LayoutDashboard, CheckSquare, Timer, BarChart2, Settings } from 'lucide-react';
 
-const TasksView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Minhas Tarefas</h2></div>;
 const PomodoroView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Foco / Pomodoro</h2></div>;
 const StatsView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Produtividade</h2></div>;
+
+const TasksView = () => {
+  const { tasks, addTask, toggleTask, removeTask } = useTodos();
+
+  return (
+    <div className="p-8">
+      <h2 className="text-2xl font-bold dark:text-white mb-4">Teste de Lógica</h2>
+      
+      <button 
+        onClick={() => addTask("Nova Tarefa de Teste", "medium")}
+        className="bg-primary-500 text-white px-4 py-2 rounded mb-4 hover:bg-primary-600"
+      >
+        + Adicionar Tarefa
+      </button>
+
+      <ul className="space-y-2">
+        {tasks.map(task => (
+          <li key={task.id} className="p-3 bg-white dark:bg-dark-800 rounded shadow flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                checked={task.isCompleted} 
+                onChange={() => toggleTask(task.id)}
+              />
+              <span className={`dark:text-white ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
+                {task.title} ({task.priority})
+              </span>
+            </div>
+            <button onClick={() => removeTask(task.id)} className="text-red-500 text-sm">
+              Remover
+            </button>
+          </li>
+        ))}
+      </ul>
+      
+      <pre className="mt-8 text-xs bg-gray-200 p-2 rounded">
+        {JSON.stringify(tasks, null, 2)}
+      </pre>
+    </div>
+  );
+};
 
 function App() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'pomodoro' | 'stats'>('tasks');
