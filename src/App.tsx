@@ -7,9 +7,18 @@ import type { FilterStatus } from './types';
 import { TaskInput } from './components/Tasks/TaskInput';
 import { TaskItem } from './components/Tasks/TaskItem';
 import { FilterBar } from './components/Tasks/FilterBar';
+import { PomodoroTimer } from './components/Pomodoro/Timer';
 
-const PomodoroView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Foco / Pomodoro</h2></div>;
 const StatsView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Produtividade</h2></div>;
+
+const PomodoroView = () => (
+  <div className="p-6 md:p-10 h-full flex flex-col">
+    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">Timer Pomodoro</h1>
+    <div className="flex-1 flex items-center justify-center">
+      <PomodoroTimer />
+    </div>
+  </div>
+);
 
 const TasksView = () => {
   const { tasks, addTask, toggleTask, removeTask } = useTodos();
