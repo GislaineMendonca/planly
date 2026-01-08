@@ -1,47 +1,65 @@
 import { useState } from 'react';
-import { useTodos } from './hooks/useTodos';
 import { LayoutDashboard, CheckSquare, Timer, BarChart2, Settings } from 'lucide-react';
+
+import { useTodos } from './hooks/useTodos';
+import type { FilterStatus } from './types';
+
+import { TaskInput } from './components/Tasks/TaskInput';
+import { TaskItem } from './components/Tasks/TaskItem';
+import { FilterBar } from './components/Tasks/FilterBar';
 
 const PomodoroView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Foco / Pomodoro</h2></div>;
 const StatsView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Produtividade</h2></div>;
 
 const TasksView = () => {
   const { tasks, addTask, toggleTask, removeTask } = useTodos();
+  
+  const [filter, setFilter] = useState<FilterStatus>('all');
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'pending') return !task.isCompleted;
+    if (filter === 'completed') return task.isCompleted;
+    return true;
+  });
+
+  const completedCount = tasks.filter(t => t.isCompleted).length;
+  const totalCount = tasks.length;
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold dark:text-white mb-4">Teste de Lógica</h2>
-      
-      <button 
-        onClick={() => addTask("Nova Tarefa de Teste", "medium")}
-        className="bg-primary-500 text-white px-4 py-2 rounded mb-4 hover:bg-primary-600"
-      >
-        + Adicionar Tarefa
-      </button>
+    <div className="max-w-4xl mx-auto p-6 md:p-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Minhas Tarefas</h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Você completou <strong className="text-primary-600 dark:text-primary-400">{completedCount}</strong> de <strong className="text-gray-700 dark:text-gray-300">{totalCount}</strong> tarefas
+        </p>
+      </div>
 
-      <ul className="space-y-2">
-        {tasks.map(task => (
-          <li key={task.id} className="p-3 bg-white dark:bg-dark-800 rounded shadow flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <input 
-                type="checkbox" 
-                checked={task.isCompleted} 
-                onChange={() => toggleTask(task.id)}
-              />
-              <span className={`dark:text-white ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
-                {task.title} ({task.priority})
-              </span>
-            </div>
-            <button onClick={() => removeTask(task.id)} className="text-red-500 text-sm">
-              Remover
-            </button>
-          </li>
-        ))}
-      </ul>
-      
-      <pre className="mt-8 text-xs bg-gray-200 p-2 rounded">
-        {JSON.stringify(tasks, null, 2)}
-      </pre>
+      <TaskInput onAddTask={addTask} />
+
+      <FilterBar currentFilter={filter} onFilterChange={setFilter} />
+
+      <div className="space-y-1">
+        {filteredTasks.length === 0 ? (
+          <div className="text-center py-20 text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+            <p>
+              {filter === 'all' 
+                ? 'Nenhuma tarefa por aqui. Adicione uma acima! 🚀' 
+                : filter === 'pending'
+                ? 'Tudo feito! Nenhuma pendência. 🎉'
+                : 'Nenhuma tarefa concluída ainda.'}
+            </p>
+          </div>
+        ) : (
+          filteredTasks.map(task => (
+            <TaskItem 
+              key={task.id} 
+              task={task} 
+              onToggle={toggleTask} 
+              onDelete={removeTask} 
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 };
@@ -58,7 +76,7 @@ function App() {
   return (
     <div className={`flex h-screen bg-gray-50 dark:bg-dark-900 transition-colors duration-300 ${darkMode ? 'dark' : ''}`}>
       
-      <aside className="w-64 bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <aside className="w-64 bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors duration-300">
         <div className="p-6 flex items-center gap-2">
           <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
             <CheckSquare className="text-white w-5 h-5" />
@@ -98,7 +116,7 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-gray-50 dark:bg-dark-900 transition-colors duration-300">
         {activeTab === 'tasks' && <TasksView />}
         {activeTab === 'pomodoro' && <PomodoroView />}
         {activeTab === 'stats' && <StatsView />}
