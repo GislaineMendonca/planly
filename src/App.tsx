@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LayoutDashboard, CheckSquare, Timer, BarChart2, Settings } from 'lucide-react';
-
+import { CheckCircle, Zap, Trophy } from 'lucide-react';
 import { useTodos } from './hooks/useTodos';
 import type { FilterStatus } from './types';
 
@@ -8,8 +8,49 @@ import { TaskInput } from './components/Tasks/TaskInput';
 import { TaskItem } from './components/Tasks/TaskItem';
 import { FilterBar } from './components/Tasks/FilterBar';
 import { PomodoroTimer } from './components/Pomodoro/Timer';
+import { WeeklyChart } from './components/Stats/WeeklyChart';
+import { StatsCard } from './components/Stats/StatsCard';
 
-const StatsView = () => <div className="p-8"><h2 className="text-2xl font-bold dark:text-white">Produtividade</h2></div>;
+const StatsView = () => {
+  const { tasks } = useTodos();
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.isCompleted).length;
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  const highPriorityPending = tasks.filter(t => !t.isCompleted && t.priority === 'high').length;
+
+  return (
+    <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Relatório de Produtividade</h1>
+        <p className="text-gray-500 dark:text-gray-400">Acompanhe seu desempenho semanal</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatsCard 
+          title="Tarefas Concluídas" 
+          value={completedTasks} 
+          icon={<CheckCircle size={24} />} 
+        />
+        <StatsCard 
+          title="Taxa de Conclusão" 
+          value={`${completionRate}%`} 
+          icon={<Zap size={24} />} 
+          trend={completionRate > 50 ? 'Excelente ritmo! 🔥' : undefined}
+        />
+        <StatsCard 
+          title="Alta Prioridade Pendente" 
+          value={highPriorityPending} 
+          icon={<Trophy size={24} />}
+          trend="Foco total aqui!"
+        />
+      </div>
+
+      <WeeklyChart tasks={tasks} />
+    </div>
+  );
+};
 
 const PomodoroView = () => (
   <div className="p-6 md:p-10 h-full flex flex-col">
