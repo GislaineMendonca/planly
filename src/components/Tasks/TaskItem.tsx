@@ -26,10 +26,13 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
             task.isCompleted ? 'text-green-500' : 'text-gray-300 hover:text-primary-500'
           }`}
         >
-          {task.isCompleted ? <CheckCircle2 size={24} weight="fill" /> : <Circle size={24} />}
+          {task.isCompleted ? (
+            <CheckCircle2 size={24} className="fill-green-500 text-white" />
+          ) : (
+            <Circle size={24} />
+          )}
         </button>
 
-        {/* Textos */}
         <div className="flex flex-col">
           <span 
             className={`font-medium text-lg transition-all ${
