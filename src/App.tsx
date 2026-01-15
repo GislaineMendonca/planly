@@ -93,9 +93,9 @@ const TasksView = () => {
           <div className="text-center py-20 text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
             <p>
               {filter === 'all' 
-                ? 'Nenhuma tarefa por aqui. Adicione uma acima! 🚀' 
+                ? 'Nenhuma tarefa por aqui. Adicione uma acima!' 
                 : filter === 'pending'
-                ? 'Tudo feito! Nenhuma pendência. 🎉'
+                ? 'Tudo feito! Nenhuma pendência.'
                 : 'Nenhuma tarefa concluída ainda.'}
             </p>
           </div>

@@ -88,7 +88,7 @@ function ModeButton({
       className={`
         flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all
         ${active 
-          ? 'bg-primary-50 dark:bg-dark-700 text-primary-700 dark:text-primary-400 shadow-sm' 
+          ? 'bg-primary-50 text-primary-700 shadow-sm dark:bg-dark-700 dark:text-white' 
           : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
         }
       `}

@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
 import type { Priority } from '../../types';
 
 interface TaskInputProps {
@@ -32,16 +32,22 @@ export function TaskInput({ onAddTask }: TaskInputProps) {
         />
         
         <div className="flex gap-2">
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as Priority)}
-            className="px-4 py-3 rounded-xl bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 
-              text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50 cursor-pointer"
-          >
-            <option value="low">Baixa</option>
-            <option value="medium">Média</option>
-            <option value="high">Alta</option>
-          </select>
+          <div className="relative">
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as Priority)}
+              className="appearance-none w-full pl-4 pr-10 py-3 rounded-xl bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 
+                text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50 cursor-pointer"
+            >
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+            </select>
+            
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
+              <ChevronDown size={18} />
+            </div>
+          </div>
 
           <button
             type="submit"
