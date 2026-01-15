@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import { LayoutDashboard, CheckSquare, Timer, BarChart2, Settings } from 'lucide-react';
-import { CheckCircle, Zap, Trophy } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  CheckSquare, 
+  Timer, 
+  BarChart2, 
+  Settings, 
+  Menu,
+  X 
+} from 'lucide-react';
+
 import { useTodos } from './hooks/useTodos';
 import type { FilterStatus } from './types';
 
@@ -10,14 +18,13 @@ import { FilterBar } from './components/Tasks/FilterBar';
 import { PomodoroTimer } from './components/Pomodoro/Timer';
 import { WeeklyChart } from './components/Stats/WeeklyChart';
 import { StatsCard } from './components/Stats/StatsCard';
+import { CheckCircle, Zap, Trophy } from 'lucide-react';
 
 const StatsView = () => {
   const { tasks } = useTodos();
-
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.isCompleted).length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
   const highPriorityPending = tasks.filter(t => !t.isCompleted && t.priority === 'high').length;
 
   return (
@@ -26,27 +33,11 @@ const StatsView = () => {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Relatório de Produtividade</h1>
         <p className="text-gray-500 dark:text-gray-400">Acompanhe seu desempenho semanal</p>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatsCard 
-          title="Tarefas Concluídas" 
-          value={completedTasks} 
-          icon={<CheckCircle size={24} />} 
-        />
-        <StatsCard 
-          title="Taxa de Conclusão" 
-          value={`${completionRate}%`} 
-          icon={<Zap size={24} />} 
-          trend={completionRate > 50 ? 'Excelente ritmo! 🔥' : undefined}
-        />
-        <StatsCard 
-          title="Alta Prioridade Pendente" 
-          value={highPriorityPending} 
-          icon={<Trophy size={24} />}
-          trend="Foco total aqui!"
-        />
+        <StatsCard title="Tarefas Concluídas" value={completedTasks} icon={<CheckCircle size={24} />} />
+        <StatsCard title="Taxa de Conclusão" value={`${completionRate}%`} icon={<Zap size={24} />} trend={completionRate > 50 ? 'Excelente ritmo! 🔥' : undefined}/>
+        <StatsCard title="Alta Prioridade Pendente" value={highPriorityPending} icon={<Trophy size={24} />} trend="Foco total aqui!"/>
       </div>
-
       <WeeklyChart tasks={tasks} />
     </div>
   );
@@ -63,7 +54,6 @@ const PomodoroView = () => (
 
 const TasksView = () => {
   const { tasks, addTask, toggleTask, removeTask } = useTodos();
-  
   const [filter, setFilter] = useState<FilterStatus>('all');
 
   const filteredTasks = tasks.filter(task => {
@@ -83,30 +73,16 @@ const TasksView = () => {
           Você completou <strong className="text-primary-600 dark:text-primary-400">{completedCount}</strong> de <strong className="text-gray-700 dark:text-gray-300">{totalCount}</strong> tarefas
         </p>
       </div>
-
       <TaskInput onAddTask={addTask} />
-
       <FilterBar currentFilter={filter} onFilterChange={setFilter} />
-
       <div className="space-y-1">
         {filteredTasks.length === 0 ? (
           <div className="text-center py-20 text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
-            <p>
-              {filter === 'all' 
-                ? 'Nenhuma tarefa por aqui. Adicione uma acima!' 
-                : filter === 'pending'
-                ? 'Tudo feito! Nenhuma pendência.'
-                : 'Nenhuma tarefa concluída ainda.'}
-            </p>
+            <p>{filter === 'all' ? 'Nenhuma tarefa por aqui.' : filter === 'pending' ? 'Tudo feito!' : 'Nenhuma tarefa concluída.'}</p>
           </div>
         ) : (
           filteredTasks.map(task => (
-            <TaskItem 
-              key={task.id} 
-              task={task} 
-              onToggle={toggleTask} 
-              onDelete={removeTask} 
-            />
+            <TaskItem key={task.id} task={task} onToggle={toggleTask} onDelete={removeTask} />
           ))
         )}
       </div>
@@ -114,24 +90,65 @@ const TasksView = () => {
   );
 };
 
+
 function App() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'pomodoro' | 'stats'>('tasks');
   const [darkMode, setDarkMode] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
   };
 
+  const handleNavClick = (tab: 'tasks' | 'pomodoro' | 'stats') => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false);
+  };
+
   return (
     <div className={`flex h-screen bg-gray-50 dark:bg-dark-900 transition-colors duration-300 ${darkMode ? 'dark' : ''}`}>
       
-      <aside className="w-64 bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors duration-300">
-        <div className="p-6 flex items-center gap-2">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-dark-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 z-30">
+        <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
             <CheckSquare className="text-white w-5 h-5" />
           </div>
           <span className="text-xl font-bold text-gray-800 dark:text-white">Planly</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+        />
+      )}
+
+      <aside className={`
+        fixed md:relative z-50 h-full w-64 bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
+      `}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+              <CheckSquare className="text-white w-5 h-5" />
+            </div>
+            <span className="text-xl font-bold text-gray-800 dark:text-white">Planly</span>
+          </div>
+          
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="md:hidden text-gray-500 dark:text-gray-400"
+          >
+            <X size={24} />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 space-y-2 mt-4">
@@ -139,19 +156,19 @@ function App() {
             icon={<LayoutDashboard size={20}/>} 
             label="Tarefas" 
             active={activeTab === 'tasks'} 
-            onClick={() => setActiveTab('tasks')}
+            onClick={() => handleNavClick('tasks')}
           />
           <NavItem 
             icon={<Timer size={20}/>} 
             label="Pomodoro" 
             active={activeTab === 'pomodoro'} 
-            onClick={() => setActiveTab('pomodoro')}
+            onClick={() => handleNavClick('pomodoro')}
           />
           <NavItem 
             icon={<BarChart2 size={20}/>} 
             label="Estatísticas" 
             active={activeTab === 'stats'} 
-            onClick={() => setActiveTab('stats')}
+            onClick={() => handleNavClick('stats')}
           />
         </nav>
 
@@ -166,7 +183,7 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto bg-gray-50 dark:bg-dark-900 transition-colors duration-300">
+      <main className="flex-1 overflow-auto bg-gray-50 dark:bg-dark-900 transition-colors duration-300 pt-16 md:pt-0">
         {activeTab === 'tasks' && <TasksView />}
         {activeTab === 'pomodoro' && <PomodoroView />}
         {activeTab === 'stats' && <StatsView />}
